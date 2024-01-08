@@ -2,6 +2,7 @@
 Redoing GANplification with Bayesian-CFM Generative Model.
 
 Todos:
+
     - Connect & Run AdamMCMC
     - Connect to quantiling
     - Plot behavior for higher numbers sampled (Expectation: Converges to level of statistics of training data )
