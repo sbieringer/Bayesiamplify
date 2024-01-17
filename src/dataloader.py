@@ -33,7 +33,6 @@ def cart_to_nsphere(in_cat):
 
 
 class samplers():
-    
     def __init__(self, save_path):
         self.save_path = save_path
     
