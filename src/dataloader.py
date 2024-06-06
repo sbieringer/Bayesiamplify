@@ -74,21 +74,61 @@ class multidim_sampler(samplers):
         self.distr_args=distr_kargs
         
         self.save_path = save_path 
-        self.save_name = 'fulldata_dim{0:d}'.format(self.n_dim)        
+        self.save_name = f'fulldata_{data_type}_dim{self.n_dim}'
+        for key in distr_kargs:
+            self.save_name += f'_{key}{distr_kargs[key]}'
         super().__init__(self.save_path)
         
-    def sample_data(self, n, save_as_try=None):
-        if self.type=="donut":
+    def sample_data(self, n, save_as_try=None, start=True):
+        if start:
+            #for recursive rejecition sampling
+            self.x_counter = 0 
+            self.n_sample = n
+            
+        if "donut" in self.type:
             u_mean=self.distr_args.get('u_mean', 0)
             u_sigma=self.distr_args.get('u_sigma', 1)
-            r_mean=self.distr_args.get('r_mean', 4)
+
+            r_mean_temp = self.distr_args.get('r_mean', 4)
+            if r_mean_temp == 'exp':
+                r_mean=4-np.clip(np.random.exponential(1/2, (n,1)),0, 4)
+            if r_mean_temp == 'triag':
+                r_mean=np.random.triangular(1,6,6, (n,1))
+            else:
+                r_mean=r_mean_temp*np.ones((n,1))
             r_sigma=self.distr_args.get('r_sigma', 1)
     
             u = np.random.normal(loc=(u_mean), scale=(u_sigma), size=(n,self.n_dim))
             norm=np.sum(u**2, 1, keepdims=True) **(0.5)
-            r = np.random.normal(loc=(r_mean), scale=(r_sigma), size=(n,1))
-            x= r*u/norm
-            x=x.astype(np.float32)
+            gamma_scale = self.distr_args.get('gamma_scale', 'inf')
+            if "gamma" in self.type and gamma_scale != 'inf':
+                r = np.random.gamma(gamma_scale,1/gamma_scale, size=(n,1))
+            else:
+                r = np.random.normal(loc=0, scale=(r_sigma), size=(n,1))
+                
+            if "outer" in self.type:
+                m_cut=self.distr_args.get('m_cut', 'inf')
+                if m_cut == 'inf':
+                    r = np.abs(r)
+                else:
+                    r_prob = 1/(1+np.exp(-m_cut*r))
+                    u_draw = np.random.uniform(size=n) 
+                    del_idx = np.argwhere(u_draw>r_prob.squeeze())
+            r += r_mean
+            
+            if "outer" in self.type and m_cut != 'inf':
+                x = np.delete(r*u/norm, del_idx, axis = 0)
+                r_mean = np.delete(r_mean, del_idx, axis = 0)
+                self.x_counter += len(x)
+                if self.x_counter < self.n_sample:
+                    data_tmp = self.sample_data(2*(self.n_sample-self.x_counter), None, False)
+                    x = np.append(x, data_tmp[0], axis=0)
+                    r_mean = np.append(r_mean, data_tmp[1], axis=0)
+                    del data_tmp
+                x = x[:self.n_sample]
+                r_mean = r_mean[:self.n_sample]                
+            else:
+                x= r*u/norm
                         
         else:
             raise Exception("data_sampler: unknown sample distribution")
@@ -104,9 +144,9 @@ class multidim_sampler(samplers):
             except:
                 self.save_name = self.save_name + f'_samp{n}'
                 
-            np.save(self.save_path + self.save_name + f'_try{save_as_try}.npy', x)
-            
-        return x
+            np.savez(self.save_path + self.save_name + f'_try{save_as_try}', r_mean=r_mean, x=x)
+
+        return x.astype(np.float32), r_mean.astype(np.float32)
 
     
 class LaSeR_sampler(samplers):

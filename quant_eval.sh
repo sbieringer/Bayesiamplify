@@ -6,7 +6,7 @@
 #SBATCH --partition=maxgpu            ## or allgpu / cms / cms-uhh / maxgpu
 #SBATCH --time=48:00:00
 #SBATCH --nodes=1
-#SBATCH --job-name baysiamplify           # give job unique name
+#SBATCH --job-name quant_eval           # give job unique name
 #SBATCH --output ./run_files/training-%j.out      # terminal output
 #SBATCH --error ./run_files/training-%j.err
 #SBATCH --mail-type END
@@ -35,4 +35,4 @@ cd /home/bierings/Bayesiamplify/
 echo $(date +"%Y%m%d_%H%M%S") $SLURM_JOB_ID $SLURM_NODELIST $SLURM_JOB_GPUS  >> cuda_vis_dev.txt
 
 # run
-python3 cond_flow_matching.py
+python3 quant_eval.py

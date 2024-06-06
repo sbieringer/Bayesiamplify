@@ -1,6 +1,10 @@
 data/
+old/
 models/
 run_files/
+figs/
+
+cuda_vis_dev.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
