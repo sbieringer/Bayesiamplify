@@ -11,7 +11,7 @@
 #SBATCH --error ./run_files/training-%j.err
 #SBATCH --mail-type END
 #SBATCH --mail-user sebastian.bieringer@desy.de
-#SBATCH --constraint=P100
+#SBATCH --constraint=A100
 #SBATCH --exclude=max-cmsg007
  
 ##SBATCH --nodelist=max-cmsg[001-008]         # you can select specific nodes, if necessary
@@ -35,4 +35,4 @@ cd /home/bierings/Bayesiamplify/
 echo $(date +"%Y%m%d_%H%M%S") $SLURM_JOB_ID $SLURM_NODELIST $SLURM_JOB_GPUS  >> cuda_vis_dev.txt
 
 # run
-python3 quant_eval.py
+python3 quant_eval.py --approximate_gaussian_inference=$1 --c_factor=$2 --long=$3 --scaled=$4
