@@ -60,7 +60,18 @@ def smooth(x, kernel_size=5):
         assert x_shape == x_out.shape
         return x_out #np.mean(np.array(x).reshape(-1, kernel_size),1)
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise ArgumentTypeError('Boolean value expected.')
+
 parser = ArgumentParser()
+parser.add_argument('--approximate_gaussian_inference', type=str2bool, default=False)
 parser.add_argument('--n_points', type=int, default=1_000_000)
 parser.add_argument('--n_rep', type=int, default=0)
 
@@ -82,11 +93,11 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 
 # %%
-approximate_gaussian_inference = True #False
+approximate_gaussian_inference = runargs.approximate_gaussian_inference
 MCMC = approximate_gaussian_inference == False 
 
 train = True
-train_MCMC = MCMC #False #True
+train_MCMC = MCMC 
 
 assert MCMC != approximate_gaussian_inference; "choose either MCMC- or VI-Bayesian"
 
@@ -351,7 +362,7 @@ plt.show()
 # %%
 if MCMC:
     save_every = 100
-    MCMC_samples = 10
+    MCMC_samples = 50#10
     m_list_dir =  mkdir(save_dir + '/AdamMCMC_models/')
 
 else:

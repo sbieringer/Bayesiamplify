@@ -40,6 +40,10 @@ parser.add_argument('--long', type=str2bool, default=True)
 parser.add_argument('--scaled', type=str2bool, default=False)
 parser.add_argument('--c_factor', type=float, default=0)
 
+parser.add_argument('--start', type=int, default=0)
+parser.add_argument('--stop', type=int, default=5)
+parser.add_argument('--n_stat', type=int, default=50)
+
 runargs = parser.parse_args()
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -83,9 +87,11 @@ else:
 
 if runargs.scaled:
     name_add += "_scaled"
-    name_add += "_scaled_start"
-    n_bins_array = np.array([2,3,4,5,7,10,15,20,30,40,50,70,100])
-    
+    n_bins_array = np.array([2,3,4,5,7,10,15,20,30,40,50,70,100,200,500])
+#if runargs.approximate_gaussian_inference==False:
+    name_add += "_50draws"
+
+
 quant_list_list_name = f'quant_list_list_{donut_args["gamma_scale"]}gamma{name_add}.pkl'
 quant_list_list_path = f'./figs/' + quant_list_list_name
 
@@ -106,6 +112,8 @@ if not quant_list_list_name in os.listdir('./figs/') or linear:
 else:
     with open(quant_list_list_path, 'rb') as file: 
         quant_list_list = pickle.load(file) 
+
+assert len(quant_list_list) == len(n_bins_array), f"the loaded quant_list_list has {len(quant_list_list)} entries, but n_bins_array has {len(n_bins_array)}"
 
 ####################
 ### model params ###
@@ -134,7 +142,7 @@ if approximate_gaussian_inference:
     elif runargs.c_factor == 100.:
         ep = 40000
 
-n_stat_epis = 10 #if approximate_gaussian_inference else MCMC_samples
+n_stat_epis = runargs.n_stat #if approximate_gaussian_inference else 10
 save_every = 100
 
 if approximate_gaussian_inference:
@@ -149,7 +157,7 @@ m_list_dir = save_dir
 ### calculate quantile values ###
 #################################
 
-n_reps = range(0,5)
+n_reps = range(runargs.start,runargs.stop)
 calc = True #False
 
 if calc:
@@ -192,8 +200,8 @@ if calc:
                             z_sample_temp = z[n_z*batch_size_sample:(n_z+1)*batch_size_sample]
                             c_sample_temp = c[n_z*batch_size_sample:(n_z+1)*batch_size_sample]
                             generated_data[n_z*batch_size_sample:(n_z+1)*batch_size_sample] = model.decode(z_sample_temp, cond=c_sample_temp).detach().cpu().numpy()
-                        else:
-                            generated_data =  model.decode(z, cond=c).detach().cpu().numpy()
+                    else:
+                        generated_data =  model.decode(z, cond=c).detach().cpu().numpy()
 
             quantvals = []
             for i_nq, n_quantile in enumerate(n_bins_array):

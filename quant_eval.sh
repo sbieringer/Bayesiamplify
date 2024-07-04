@@ -4,7 +4,7 @@
 ## SLURM JOB COMMANDS ###
 #########################
 #SBATCH --partition=maxgpu            ## or allgpu / cms / cms-uhh / maxgpu
-#SBATCH --time=48:00:00
+#SBATCH --time=72:00:00
 #SBATCH --nodes=1
 #SBATCH --job-name quant_eval           # give job unique name
 #SBATCH --output ./run_files/training-%j.out      # terminal output
@@ -35,4 +35,4 @@ cd /home/bierings/Bayesiamplify/
 echo $(date +"%Y%m%d_%H%M%S") $SLURM_JOB_ID $SLURM_NODELIST $SLURM_JOB_GPUS  >> cuda_vis_dev.txt
 
 # run
-python3 quant_eval.py --approximate_gaussian_inference=$1 --c_factor=$2 --long=$3 --scaled=$4
+python3 quant_eval.py --approximate_gaussian_inference=$1 --c_factor=$2 --long=$3 --scaled=$4 --start=$5 --stop=$6 --n_stat=$7 --linear=$8

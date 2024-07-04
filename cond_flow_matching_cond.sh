@@ -4,7 +4,7 @@
 ## SLURM JOB COMMANDS ###
 #########################
 #SBATCH --partition=maxgpu            ## or allgpu / cms / cms-uhh / maxgpu
-#SBATCH --time=48:00:00
+#SBATCH --time=72:00:00
 #SBATCH --nodes=1
 #SBATCH --job-name baysiamplify           # give job unique name
 #SBATCH --output ./run_files/training-%j.out      # terminal output
@@ -35,5 +35,6 @@ cd /home/bierings/Bayesiamplify/
 echo $(date +"%Y%m%d_%H%M%S") $SLURM_JOB_ID $SLURM_NODELIST $SLURM_JOB_GPUS  >> cuda_vis_dev.txt
 
 # run
-python3 cond_flow_matching_cond.py --n_points=$1 --n_rep=$2 --k=$3 #--gamma_scale=$4 --r_mean=$5
-#python3 cond_flow_matching_cond.py --n_points=$1 --n_rep=$2 --inv_temp=$3 --lr=$4 --noise=$5 --sigma_adam_dir_denom=$6 #--gamma_scale=$4
+#python3 cond_flow_matching_cond.py --approximate_gaussian_inference=$1 --n_points=$2 --n_rep=$3 --k=$4 #--gamma_scale=$4 --r_mean=$5 #USE WITH APROXIMATE INFERENCE
+
+python3 cond_flow_matching_cond.py --approximate_gaussian_inference=$1 --n_points=$2 --n_rep=$3 --inv_temp=$4 --lr=$5 --noise=$6 --sigma_adam_dir_denom=$7 #--gamma_scale=$4 #USE WITH MCMC
