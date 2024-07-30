@@ -1,14 +1,8 @@
 # Bayesiamplify
-Redoing GANplification with Bayesian-CFM Generative Model.
+Redoing GANplification with Bayesian-CFM Generative Model for our paper [Calibrating Bayesian Generative Machine Learning for Bayesiamplification](https://arxiv.org) TBA
 
-Todos:
+Including:
 
-    - Connect & Run AdamMCMC
-    - Connect to quantiling
-    - Plot behavior for higher numbers sampled (Expectation: Converges to level of statistics of training data )
-    - Calibration test possible?
-    - Plot behavior for differing numbers of quantiles (Expectation: Amplification independent)
-    - Plot behavior for higher numbers of training data, scaling the number of of quantiles (Expectation: Maybe the Amplification decreases, whos knows)
-    - Plot behavior for higher dimensions (Expectation: Maybe the Amplification decreases, whos knows)
-
-    - maybe add Bayesian-Calomplification
+    - Training Bayesian Continuous Normalizing Flows in `cond_flow_matching_cond.py`
+    - Counting bin values `quant_eval.py`
+    - Evaluating Calibration and Amplification in `eval_calibration_amplification.ipynb`

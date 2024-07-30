@@ -33,6 +33,9 @@ def cart_to_nsphere(in_cat):
 
 
 class samplers():
+    '''
+    base class for loading existing datasets
+    '''
     def __init__(self, save_path):
         self.save_path = save_path
     
@@ -67,6 +70,9 @@ class samplers():
     
 
 class multidim_sampler(samplers):
+    '''
+    generate the 2d samples from Gaussian or Gamma fct ring, with constant or varying radius
+    '''
     
     def __init__(self, n_dim, data_type="donut", save_path=None, **distr_kargs):
         self.type=data_type
